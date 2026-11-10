@@ -1,0 +1,6 @@
+Using statistical security parameter 40
+Trying to run 64-bit computation
+The following benchmarks are including preprocessing (offline phase).
+Time = 0.00285047 seconds 
+Data sent = 0.000393 MB in ~12 rounds (party 1 only; use '-v' for more details)
+Global data sent = 0.001171 MB (all parties)

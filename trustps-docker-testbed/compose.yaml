@@ -1,0 +1,99 @@
+name: trustps
+services:
+  mosquitto-b1:
+    build: ./mosquitto
+    image: trustps-mosquitto:2.0-dev
+    container_name: trustps-b1
+    hostname: mosquitto-b1
+    command: ["mosquitto", "-c", "/mosquitto/config/mosquitto.conf"]
+    ports: ["1883:1883"]
+    volumes:
+      - ./mosquitto/b1/config:/mosquitto/config:ro
+      - b1-data:/mosquitto/data
+      - b1-log:/mosquitto/log
+    networks: [trustps-net]
+    cap_add: [NET_ADMIN]
+    restart: unless-stopped
+
+  mosquitto-b2:
+    image: trustps-mosquitto:2.0-dev
+    container_name: trustps-b2
+    hostname: mosquitto-b2
+    command: ["mosquitto", "-c", "/mosquitto/config/mosquitto.conf"]
+    ports: ["1884:1883"]
+    volumes:
+      - ./mosquitto/b2/config:/mosquitto/config:ro
+      - b2-data:/mosquitto/data
+      - b2-log:/mosquitto/log
+    networks: [trustps-net]
+    cap_add: [NET_ADMIN]
+    restart: unless-stopped
+
+  mosquitto-b3:
+    image: trustps-mosquitto:2.0-dev
+    container_name: trustps-b3
+    hostname: mosquitto-b3
+    command: ["mosquitto", "-c", "/mosquitto/config/mosquitto.conf"]
+    ports: ["1885:1883"]
+    volumes:
+      - ./mosquitto/b3/config:/mosquitto/config:ro
+      - b3-data:/mosquitto/data
+      - b3-log:/mosquitto/log
+    networks: [trustps-net]
+    cap_add: [NET_ADMIN]
+    restart: unless-stopped
+
+  mpc0:
+    build:
+      context: ./mp-spdz
+      args:
+        MP_SPDZ_REF: ${MP_SPDZ_REF:-master}
+    image: trustps-mpspdz:dev
+    container_name: trustps-mpc0
+    hostname: mpc0
+    command: ["sleep", "infinity"]
+    volumes:
+      - mpc0-data:/opt/MP-SPDZ/Player-Data
+    networks: [trustps-net]
+    cap_add: [NET_ADMIN]
+
+  mpc1:
+    image: trustps-mpspdz:dev
+    container_name: trustps-mpc1
+    hostname: mpc1
+    command: ["sleep", "infinity"]
+    volumes:
+      - mpc1-data:/opt/MP-SPDZ/Player-Data
+    networks: [trustps-net]
+    cap_add: [NET_ADMIN]
+    depends_on: [mpc0]
+
+  mpc2:
+    image: trustps-mpspdz:dev
+    container_name: trustps-mpc2
+    hostname: mpc2
+    command: ["sleep", "infinity"]
+    volumes:
+      - mpc2-data:/opt/MP-SPDZ/Player-Data
+    networks: [trustps-net]
+    cap_add: [NET_ADMIN]
+    depends_on: [mpc0]
+
+networks:
+  trustps-net:
+    name: trustps-net
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.29.0.0/24
+
+volumes:
+  b1-data:
+  b1-log:
+  b2-data:
+  b2-log:
+  b3-data:
+  b3-log:
+  mpc0-data:
+  mpc1-data:
+  mpc2-data:
